@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>
+            Settings • Nettleweb
+        </title>
+        <style>
+            body {
+                background:#222;
+                color:white;
+                font-family:sans-serif;
+                padding:20px;
+            }
+            input, textarea, button {
+                width:100%;
+                margin-bottom:10px;
+                padding:8px;
+                background:#333;
+                color:white;
+                border:1px solid #555;
+                border-radius:5px;
+            }
+            button {
+                cursor:pointer;
+                background:#444;
+            }
+            button:hover {
+                background:#666;
+            }
+            img {
+                width:80px;
+                height:80px;
+                border-radius:50%;
+                object-fit:cover;
+                border:1px solid white;
+                margin-bottom:10px;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>
+            Settings
+        </h2>
+        <img id="pfpPreview" src="" alt="Profile Picture">
+        <input type="file" id="pfp" accept="image/*">
+        <input type="text" id="displayName" placeholder="Display Name">
+        <input type="email" id="email" placeholder="Email">
+        <textarea id="bio" rows="4" placeholder="Bio"></textarea>
+        <label>
+            Name Color
+        </label>
+        <input type="color" id="color">
+        <button id="save">
+            Save Changes
+        </button>
+        <button onclick="window.location.href='/'">
+            Back to Chat
+        </button>
+        <script>
+            let user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                alert("You Must Be Logged In");
+                location.href = "/";
+            }
+            document.getElementById('displayName').value = user.displayName || '';
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('bio').value = user.bio || '';
+            document.getElementById('color').value = user.color || '#ffffff';
+            document.getElementById('pfpPreview').src = user.profilePic || '';
+            document.getElementById('save').onclick = async () => {
+                const fd = new FormData();
+                fd.append('id', user.id);
+                fd.append('displayName', displayName.value);
+                fd.append('email', email.value);
+                fd.append('bio', bio.value);
+                fd.append('color', color.value);
+                if (pfp.files[0]) {
+                    fd.append('pfp', pfp.files[0]);
+                }
+                const res = await fetch('/update-profile', {
+                    method: 'POST',
+                    body: fd
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    alert("Profile updated!");
+                }
+            };
+        </script>
+    </body>
+</html>

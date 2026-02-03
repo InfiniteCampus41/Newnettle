@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>
+            Login • Nettleweb
+        </title>
+        <style>
+            body {
+                background:#222;
+                color:white;
+                font-family:sans-serif;
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                height:100vh;
+                margin:0;
+            }
+            .box {
+                background:#333;
+                padding:20px;
+                border-radius:10px;
+                width:300px;
+            }
+            input, button {
+                width:100%;
+                margin-top:10px;
+                padding:8px;
+                background:#444;
+                color:white;
+                border:1px solid #888;
+                border-radius:5px;
+            }
+            button:hover {
+                background:#666;
+                cursor:pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="box">
+            <h2>
+                Login / Sign Up
+            </h2>
+            <p id="status">
+            </p>
+            <input id="email" type="email" placeholder="Email">
+            <input id="displayName" type="text" placeholder="Display name (signup)">
+            <input id="password" type="password" placeholder="Password">
+            <button id="login">
+                Login
+            </button>
+            <button id="signup">
+                Sign Up
+            </button>
+        </div>
+        <script>
+            if (localStorage.getItem('user')) {
+                location.href = '/index.html';
+            }
+            const status = document.getElementById('status');
+            document.getElementById('login').onclick = async () => {
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                const res = await fetch('/login', {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (!data.ok) return status.textContent = data.message;
+                localStorage.setItem('user', JSON.stringify(data.user));
+                location.href = '/index.html';
+            };
+            document.getElementById('signup').onclick = async () => {
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                const displayName = displayNameInput.value;
+                const res = await fetch('/signup', {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ email, password, displayName })
+                });
+                const data = await res.json();
+                if (!data.ok) return status.textContent = data.message;
+                localStorage.setItem('user', JSON.stringify(data.user));
+                location.href = '/index.html';
+            };
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const displayNameInput = document.getElementById('displayName');
+        </script>
+    </body>
+</html>
